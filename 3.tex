@@ -1,0 +1,44 @@
+\section{Consider flipping an unfair coin ten times, and getting 10 heads. Calculate the Feldman-Cousins 90\% confidence interval for \texorpdfstring{$p$}{p}, the probability of getting heads on the coin. Submit a copy of your code or equivalent.}
+
+Since we're told this is an unfair coin but nothing else, a uniform prior $P(p)=1, p \in [0,1]$ seems like a reasonable choice.
+
+Find our maximum likelihood $p_{\text{best}}$, using $d$ to refer to the data of getting 10 heads in 10 tries:
+
+\begin{align*}
+    L(n|p, N) &= \frac{N!}{n!(N-n)!} p^{n}(1-p)^{N-n} \\
+    L(d|p) &= \frac{10!}{10!(10-10)!} p^{10}(1-p)^{10-10} \\
+    &= p^{10} \\
+\end{align*}
+
+Normalize:
+\begin{align*}
+    L(d|p) &= 11p^{10} \\
+\end{align*}
+
+
+This is clearly maximized (over $[0,1]$) when $p=1$.
+
+$$\implies p_{\text{best}} = 1$$
+
+Now calculate the likelihood ratio:
+
+\begin{align*}
+    R &= \frac{L(d|p)}{L(d|p_{\text{best}})} \\
+    &= \frac{11p^{10}}{111^{10}} \\
+    &= p^{10} \\
+\end{align*}
+
+Now start from the highest $R$ and go to lower $R$ until the integral of $L$ is 0.9.
+
+Conveniently $R=L$ here, and the highest $R$ is at $p=1$. Call the lower bound on the interval $a$.
+
+\begin{align*}
+    0.9 &= \int_a^1 L dp \\
+    &= 11\int_a^1 p^{10} dp \\
+    &= 11\left.\frac{p^{11}}{11}\right|_a^1 \\
+    &= 1 - a^{11} \\
+    0.1 &= a^{11} \\
+    a &= \sqrt[11]{0.1} \approx 0.811 \\
+\end{align*}
+
+So the Feldman-Cousins confidence interval is $[\sqrt[11]{0.1}, 1]$.
