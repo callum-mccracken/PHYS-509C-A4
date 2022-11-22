@@ -1064,6 +1064,11 @@ INPUT ./1.tex
 INPUT ./1.tex
 INPUT 1.tex
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmbx12.tfm
+INPUT ./q1_a.png
+INPUT ./q1_a.png
+INPUT q1_a.png
+INPUT ./q1_a.png
+INPUT ./q1_a.png
 INPUT ./2.tex
 INPUT ./2.tex
 INPUT ./2.tex

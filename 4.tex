@@ -1,23 +1,54 @@
 \section{Fitting with correlated noise in the time domain.}
 
-Suppose that we measure a time-varying noise signal $n(t)$ that is sampled
-at time intervals $\Delta t$. We record the value at times $t_k = k\Delta t$, where $k$ ranges
-from 0 to $N-1$, and $N$ is the number of samples recorded. Assume that $N$ is an
-even number. The function $n(t)$ can be written as a discrete Fourier transform:
-
-$$n(t) = \sum_{m=0}^{N-1}[A_m\cos(m\omega_0 t) + B_m \sin(m\omega_0 t)]$$
-
-where $\omega_0 = \frac{2\pi}{N\Delta t}$. (Note that one may set $B_0 = B_{N/2} = 0$ without loss of generality here, since the sine function will equal zero if $m = 0$, and at any discrete time $t_k = k\Delta t$ if $m = N/2$.) We may collectively refer to the set of $N$ coefficients $A_0...A_{N/2}, B_1...B{N/2-1}$ as $\tilde{n}$.
-
-A common case is Gaussian stationary noise. This can be defined as noise for which, at every frequency $f_m = \frac{m\omega_0}{2\pi}$, $A_m$ and $B_m$ are two indepen-dent random variables distributed as Gaussians with mean of zero and standard deviation of $\sigma_m$. (Of course $B_0 = B_{N/2} = 0$ still.) The quantity $\sigma_m^2$ is proportional to a quantity called the “power spectral density” of the noise. If $\sigma_m$ has a constant value $\sigma$ for all frequencies (that is, $\sigma_m = \sigma$ for all values of $m$), then
-$n(t)$ is called ``white noise''.
-
 \todo[inline]{this question has a note!}
 
 \begin{enumerate}[label=\textbf{\Alph*}.]
     \item Consider the measurements $n(t_1)$ and $n(t_2)$ taken at two possibly different
     times $t_1 = k_1\Delta t$ and $t_2 = k_2\Delta t$. Derive a formula for the covariance
     $\operatorname{cov}(n(t_1), n(t_2))$. Calculate the mean and variance of $n(t_k)$.
+
+    Calculate covariance starting with the definition of $n$ and using linearity:
+    \begin{align*}
+        &\operatorname{cov}(n(t_1), n(t_2)) \\
+        &= \operatorname{cov}\left(\sum_{m=0}^{N-1}[A_m\cos(m\omega_0 k_1\Delta t) + B_m \sin(m\omega_0 k_1\Delta t)],\right. \\
+        &\hspace{2cm}\left.\sum_{n=0}^{N-1}[A_n\cos(n\omega_0 k_2\Delta t) + B_n \sin(n\omega_0 k_2\Delta t)]\right) \\
+        &= \sum_{m=0}^{N-1} \sum_{n=0}^{N-1} \left(\operatorname{cov}(A_m, A_n)\cos(m\omega_0 k_1\Delta t)\cos(n\omega_0 k_2\Delta t)\right. \\
+        &\hspace{2cm}+ \operatorname{cov}(A_m, B_n)\cos(m\omega_0 k_1\Delta t)\sin(n\omega_0 k_2\Delta t) \\
+        &\hspace{2cm}+\operatorname{cov}(B_m, A_n) \sin(m\omega_0 k_1\Delta t)\cos(n\omega_0 k_2\Delta t) \\
+        &\hspace{2cm}+\left.\operatorname{cov}(B_m, B_n) \sin(m\omega_0 k_1\Delta t)\sin(n\omega_0 k_2\Delta t)\right) \\
+    \end{align*}
+
+    Since $A_m, B_m$ are independent Gaussians with standard deviation $\sigma_m$, we can say that:
+
+    $$\operatorname{cov}(A_m, B_n) = \operatorname{cov}(B_m, A_n) = 0$$
+
+    $$\operatorname{cov}(A_m, A_n) = \operatorname{cov}(B_m, B_n) = \delta_{mn}\sigma_m^2$$
+
+    Use the two equations above in the covariance expression:
+    \begin{align*}
+        &\operatorname{cov}(n(t_1), n(t_2)) \\
+        &= \sum_{m=0}^{N-1} \sum_{n=0}^{N-1} \left(\delta_{mn}\sigma_m^2\cos(m\omega_0 k_1\Delta t)\cos(n\omega_0 k_2\Delta t)\right. \\
+        &\hspace{2cm}+ 0\cos(m\omega_0 k_1\Delta t)\sin(n\omega_0 k_2\Delta t) \\
+        &\hspace{2cm}+ 0\sin(m\omega_0 k_1\Delta t)\cos(n\omega_0 k_2\Delta t) \\
+        &\hspace{2cm}+\left.\delta_{mn}\sigma_m^2 \sin(m\omega_0 k_1\Delta t)\sin(n\omega_0 k_2\Delta t)\right) \\
+        &= \sum_{m=0}^{N-1} \sigma_m^2\left(\cos(m\omega_0 k_1\Delta t)\cos(m\omega_0 k_2\Delta t) + \sin(m\omega_0 k_1\Delta t)\sin(m\omega_0 k_2\Delta t)\right) \\
+    \end{align*}
+
+    I don't think we can smplify much further, now let's find the variance:
+
+    \begin{align*}
+        \operatorname{var}(n(t_k)) &=\operatorname{cov}(n(t_k), n(t_k)) \\
+        &= \sum_{m=0}^{N-1} \sigma_m^2\left(\cos(m\omega_0 k\Delta t)\cos(m\omega_0 k\Delta t) + \sin(m\omega_0 k\Delta t)\sin(m\omega_0 k\Delta t)\right) \\
+        &= \sum_{m=0}^{N-1} \sigma_m^2\left(\cos^2(m\omega_0 k\Delta t) + \sin^2(m\omega_0 k\Delta t)\right) \\
+        &= \sum_{m=0}^{N-1} \sigma_m^2 \\
+    \end{align*}
+
+    Then find the mean:
+
+    \begin{align*}
+        \overline{n(t_k)} &= 
+    \end{align*}
+
 
     \item Suppose we are trying to fit a function $C_s(t)$ to some measured time series, where $s(t)$ is a known shape and $C$ is an unknown normalization we would like to fit for. Our model for the measured data $g(t)$ is $g(t) = C_s(t) + n(t)$, where $n(t)$ is the randomly generated noise from our stationary noise model described above. If we write down a least squares fit directly using the $N$ data points $g(t_k)$, we would find that they have a non-trivial covariance matrix (see Part A). But suppose that we take a discrete Fourier transform of $g(t)$ and $s(t)$ to get some sets of coefficients $\tilde{g}$ and $\tilde{s}$, analogous to $\tilde{n}$. Show that using these you can now write down a much simpler expression for the least squares formula. Do this, and taking its derivative with respect to $C$ and setting it equal to zero, derive a formula for the best fit $\hat{C}$ in terms of $g(t)$, $s(t)$, and $\sigma_m$.
 

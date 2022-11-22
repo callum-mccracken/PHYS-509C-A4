@@ -1,38 +1,5 @@
-1: Done.
-2: Done.
-3: Done.
-4: Done.
-5: Done.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+1: Need to do B, done A
+2: Suspicious about degrees of freedom, otherwise done
+3: Done? Still unsure what code to submit.
+4: Need to do B, done (?) A
 

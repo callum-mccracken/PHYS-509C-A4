@@ -1,31 +1,71 @@
 \section{Chi-squared fits with systematics.}
 
 \begin{enumerate}[label=\textbf{\Alph*}.]
-    \item A theory predicts that a variable $y$ depends on a variable $x$ according to: $y = 3x^2 -1$. A dataset is obtained. The resolution on each y measurement is 0.02. Use a $\chi^2$ statistic to test whether the data are consistent with the theory. Quote a p-value.
+    \item A theory predicts that a variable $y$ depends on a variable $x$ according to: $y = 3x^2 -1$. A dataset is obtained. The resolution on each $y$ measurement is 0.02. Use a $\chi^2$ statistic to test whether the data are consistent with the theory. Quote a p-value.
 
-    The dataset: x y
-
-    0.1 -0.951
-    
-    0.2 -0.842
-    
-    0.3 -0.741
-    
-    0.4 -0.492
-    
-    0.5 -0.229
-    
-    0.6 0.118
-    
-    0.7 0.494
-    
-    0.8 0.957
-    
-    0.9 1.449
-    
-    1.0 2.055
+    See code for details, but $\chi^2=24.815$, $p=0.00517$, using 10 degrees of freedom.
 
     \item Your graduate student now comes to you with worries about a possible systematic on the measured $y$ values. She suspects that each $y$ value could be shifted by an amount $dy=ax$, where $a$ is some constant. Through diligent work she has determined that $a=0\pm0.05$. Repeat the calculation of Part A, this time including the effects of this systematic uncertainty.
 
+    Now, because of the systematic we'll need to use the more complicated $\chi^2$ expression with the covariance matrix.
+
+    \begin{align*}
+        \chi^2(a) &= \sum_{i=1}^N \sum_{j=1}^N (y_i - f(x_i|a)) V_{ij}^{-1} (y_j - f(x_j|a))
+    \end{align*}
+
+    We know $f(x|a) = f(x) + ax = 3x^2 - 1 + ax$, now find the new covariance matrix.
+
+    Say $y_i = f(x_i|a) + Y_i$, where $Y_i$ is a random variable for the fluctuations of $y_i$ about $f(x_i|a)$.
+
+    \begin{align*}
+        \operatorname{cov}(y_i, y_j) &= \operatorname{cov}(f(x_i|a) + Y_i, f(x_j|a) + Y_j) \\
+        &= \operatorname{cov}(3x_i^2 - 1 + ax_i + Y_i, 3x_j^2 - 1 + ax_j + Y_j) \\
+        &= \operatorname{cov}(3x_i^2, 3x_j^2)
+         + \operatorname{cov}(3x_i^2, - 1)
+         + \operatorname{cov}(3x_i^2, ax_j)
+         + \operatorname{cov}(3x_i^2, Y_j) \\
+        &+ \operatorname{cov}(-1, 3x_j^2)
+         + \operatorname{cov}(-1, - 1)
+         + \operatorname{cov}(-1, ax_j)
+         + \operatorname{cov}(-1, Y_j) \\
+        &+ \operatorname{cov}(ax_i, 3x_j^2)
+         + \operatorname{cov}(ax_i, - 1)
+         + \operatorname{cov}(ax_i, ax_j)
+         + \operatorname{cov}(ax_i, Y_j) \\
+        &+ \operatorname{cov}(Y_i, 3x_j^2)
+         + \operatorname{cov}(Y_i, - 1)
+         + \operatorname{cov}(Y_i, ax_j)
+         + \operatorname{cov}(Y_i, Y_j) \\
+    \end{align*}
     
+    The covariance of anything with a constant is zero, and since we know the $x_i$ values exactly we can treat those as constants too. However let's be careful not to treat $a$ as a constant here!
+
+    \begin{align*}
+        \operatorname{cov}(y_i, y_j) &= 0
+         + 0
+         + 0
+         + 0 \\
+        &+ 0
+         + 0
+         + 0
+         + 0 \\
+        &+ 0
+         + 0
+         + x_ix_j\operatorname{cov}(a, a)
+         + x_i\operatorname{cov}(a, Y_j) \\
+        &+ 0
+         + 0
+         + x_j\operatorname{cov}(Y_i, a)
+         + \operatorname{cov}(Y_i, Y_j) \\
+    \end{align*}
+
+    We assume our statistical fluctuations $Y_i$ are independent of $a$, so:
+    \begin{align*}
+        \operatorname{cov}(y_i, y_j) &= x_ix_j\operatorname{cov}(a, a) + \operatorname{cov}(Y_i, Y_j) \\
+        V_{ij} &= x_ix_j\sigma_a^2 + \delta_{ij}\sigma_y^2 \\
+    \end{align*}
+
+    Using this to solve for $\chi^2$ and the $p$-value as before, we find: $\chi^2=6.967$, $p=0.641$, with 9 degrees of freedom (10 data points, -1 for the free parameter).
+
+
 \end{enumerate}

@@ -1,43 +1,72 @@
-"""Q2 -- Age of the Universe"""
-import sympy
+"""Q2 -- Chi-squared fits with systematics"""
+import numpy as np
+from scipy import stats
+import matplotlib.pyplot as plt
 
-# define symbols
-O, sigma_O, H, sigma_H, sigma_f = sympy.symbols(
-    "O, sigma_O, H, sigma_H, sigma_f", real=True)
 
-# define values to plug in later
-values = {
-    O: 0.3166,  # Omega_m
-    sigma_O: 0.0084,
-    H: 2.18007223e-18,  # H_0, converted to 1/s units
-    sigma_H: 1.94446757e-20,
-    sigma_f: 9.87066385e-57  # uncertainty given in question, in 1/s^3 units
-}
+def main():
+    """Do some chi-squared fitting."""
 
-# define f = O H^3 and get its derivatives to use in the error prop equation
-f = O * H**3
-df_dH = sympy.diff(f, H)
-df_dO = sympy.diff(f, O)
+    # Part A:
+    # Theory: y = 3x^2 -1.
+    # A dataset is obtained.
+    # The resolution on each y measurement is 0.02.
+    # Use a chi^2 statistic to test whether the theory.
+    # Quote a p-value.
 
-# age of universe and derivatives, for the same purpose
-t_u: sympy.Symbol = 2/(3*H*sympy.sqrt(1-O)) * sympy.asinh(sympy.sqrt((1-O)/O))
-dt_dH = sympy.diff(t_u, H)
-dt_dO = sympy.diff(t_u, O)
+    # dataset
+    x = np.array([
+        0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0])
+    y = np.array([
+        -0.951, -0.842, -0.741, -0.492,
+        -0.229, 0.118, 0.494, 0.957, 1.449, 2.055])
+    sigma_y = 0.02
 
-# rearrange error propagation equation to get correlation coefficient
-rho: sympy.Symbol = (
-    sigma_f**2 - df_dH**2 * sigma_H**2 - df_dO**2 * sigma_O**2
-    )/(2*df_dH*df_dO*sigma_H*sigma_O)
-print(f"Correlation Coefficient: {rho.subs(values):.3g}")
+    # model values
+    expected_y = 3*x**2 - 1
 
-# get error on age of universe
-sigma_t = sympy.sqrt(
-    rho * 2*dt_dH*dt_dO*sigma_H*sigma_O +
-    dt_dH**2 * sigma_H**2 + dt_dO**2 * sigma_O**2)
-print(f"t_u: {t_u.subs(values):.3g} +/- {sigma_t.subs(values):.3g}")
+    # cheeky lil plot
+    plt.plot(x, y, 'k.')
+    plt.plot(x, expected_y, 'b--')
+    plt.savefig("q2_data_and_expected.png")
+    plt.cla()
+    plt.clf()
 
-# convert to billions of years
-GIGAYEARS_PER_SECOND = 3.16887646e-17
-gyrs = t_u.subs(values) * GIGAYEARS_PER_SECOND
-gyrs_uncert = sigma_t.subs(values) * GIGAYEARS_PER_SECOND
-print(f"Or in billion years, {gyrs:.3f} +/- {gyrs_uncert:.3f}")
+    # calculate chi2 and p-value
+    chi_squared_value = np.sum(((y - expected_y)/sigma_y)**2)
+    n_dof = len(y)
+    p_value = 1 - stats.chi2.cdf(chi_squared_value, df=n_dof)
+    print(f"{chi_squared_value=:.5f}, {p_value=:.5f}")
+
+    # then part b):
+    # Add a systematic: dy=ax --> y = y+ax, a=const. a = 0 +- 0.05
+    # Get chi2 and p-value again.
+
+    sigma_a = 0.05
+
+    # first make covariance matrix
+    cov_mtx = np.empty((len(x),len(x)))
+    for i, x_i in enumerate(x):
+        for j, x_j in enumerate(x):
+            delta_ij = int(i == j)
+            cov_mtx[i, j] = x_i*x_j*sigma_a**2 + delta_ij*sigma_y**2
+
+    inv_cov_mtx = np.linalg.inv(cov_mtx)
+
+    # Then calculate the chi^2 thing
+    # Use a=0 in f(x_i|a) since we know a=0 is the best-fit value
+    chi2_with_syst = 0
+    for i, x_i in enumerate(x):
+        for j, x_j in enumerate(x):
+            front = (y[i] - (3*x_i**2 - 1))
+            back = (y[j] - (3*x_j**2 - 1))
+            chi2_with_syst += front * inv_cov_mtx[i,j] * back
+
+    n_dof_with_syst = len(y) - 1
+    p_value_with_syst = 1 - stats.chi2.cdf(chi2_with_syst, df=n_dof_with_syst)
+    print(f"{chi2_with_syst=:.5f}, {p_value_with_syst=:.5f}")
+
+
+
+if __name__ == "__main__":
+    main()
