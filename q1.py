@@ -1,9 +1,8 @@
 """Q1 -- Medical Trials"""
 
-import random
-import math
 import numpy as np
 from scipy import stats
+from scipy.stats import binomtest
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 
@@ -44,21 +43,21 @@ def simulate(n_trials=100):
         # to check if we're done this trial
         finished = False
 
-        # start with 0-24 = random trials
+        # start with 0-24 = random trials, binomial
         # p=0.5 so we can use this randint(2) thing
-        n_survived = np.sum(np.random.randint(2, size=25))
+        n_survived = np.random.binomial(25, 0.5)
 
         # at n=25-99 decide if we should quit (i.e. 99% CL success)
-        for _ in range(25,100):
-            p_recover_by_chance = sum(
-                int(math.comb(N,n_i)) * p**n_i * (1-p)**(N-n_i)
-                for n_i in range(n_survived, N+1))
+        for N in range(25,100):
+            # this is the sum of P(n_i|N,p) for n_i >= n_survived
+            p_recover_by_chance = binomtest(
+                k=n_survived, n=N, p=p, alternative="greater").pvalue
             if p_recover_by_chance < 0.01:
                 n_99cl += 1
                 finished = True
                 break
             # decide if the next patient lives or dies
-            n_survived += random.randint(0, 1)
+            n_survived += np.random.binomial(1, 0.5)
         if not finished:
             # at n=100
             if n_survived > n_part_a:

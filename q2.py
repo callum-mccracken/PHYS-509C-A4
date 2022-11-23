@@ -34,7 +34,7 @@ def main():
 
     # calculate chi2 and p-value
     chi_squared_value = np.sum(((y - expected_y)/sigma_y)**2)
-    n_dof = len(y)
+    n_dof = len(y) - 1
     p_value = 1 - stats.chi2.cdf(chi_squared_value, df=n_dof)
     print(f"{chi_squared_value=:.5f}, {p_value=:.5f}")
 
@@ -62,7 +62,7 @@ def main():
             back = (y[j] - (3*x_j**2 - 1))
             chi2_with_syst += front * inv_cov_mtx[i,j] * back
 
-    n_dof_with_syst = len(y) - 1
+    n_dof_with_syst = len(y)
     p_value_with_syst = 1 - stats.chi2.cdf(chi2_with_syst, df=n_dof_with_syst)
     print(f"{chi2_with_syst=:.5f}, {p_value_with_syst=:.5f}")
 

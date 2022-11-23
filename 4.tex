@@ -1,7 +1,5 @@
 \section{Fitting with correlated noise in the time domain.}
 
-\todo[inline]{this question has a note!}
-
 \begin{enumerate}[label=\textbf{\Alph*}.]
     \item Consider the measurements $n(t_1)$ and $n(t_2)$ taken at two possibly different
     times $t_1 = k_1\Delta t$ and $t_2 = k_2\Delta t$. Derive a formula for the covariance
@@ -10,9 +8,9 @@
     Calculate covariance starting with the definition of $n$ and using linearity:
     \begin{align*}
         &\operatorname{cov}(n(t_1), n(t_2)) \\
-        &= \operatorname{cov}\left(\sum_{m=0}^{N-1}[A_m\cos(m\omega_0 k_1\Delta t) + B_m \sin(m\omega_0 k_1\Delta t)],\right. \\
-        &\hspace{2cm}\left.\sum_{n=0}^{N-1}[A_n\cos(n\omega_0 k_2\Delta t) + B_n \sin(n\omega_0 k_2\Delta t)]\right) \\
-        &= \sum_{m=0}^{N-1} \sum_{n=0}^{N-1} \left(\operatorname{cov}(A_m, A_n)\cos(m\omega_0 k_1\Delta t)\cos(n\omega_0 k_2\Delta t)\right. \\
+        &= \operatorname{cov}\left(\sum_{m=0}^{N/2}[A_m\cos(m\omega_0 k_1\Delta t) + B_m \sin(m\omega_0 k_1\Delta t)],\right. \\
+        &\hspace{2cm}\left.\sum_{n=0}^{N/2}[A_n\cos(n\omega_0 k_2\Delta t) + B_n \sin(n\omega_0 k_2\Delta t)]\right) \\
+        &= \sum_{m=0}^{N/2} \sum_{n=0}^{N/2} \left(\operatorname{cov}(A_m, A_n)\cos(m\omega_0 k_1\Delta t)\cos(n\omega_0 k_2\Delta t)\right. \\
         &\hspace{2cm}+ \operatorname{cov}(A_m, B_n)\cos(m\omega_0 k_1\Delta t)\sin(n\omega_0 k_2\Delta t) \\
         &\hspace{2cm}+\operatorname{cov}(B_m, A_n) \sin(m\omega_0 k_1\Delta t)\cos(n\omega_0 k_2\Delta t) \\
         &\hspace{2cm}+\left.\operatorname{cov}(B_m, B_n) \sin(m\omega_0 k_1\Delta t)\sin(n\omega_0 k_2\Delta t)\right) \\
@@ -27,29 +25,59 @@
     Use the two equations above in the covariance expression:
     \begin{align*}
         &\operatorname{cov}(n(t_1), n(t_2)) \\
-        &= \sum_{m=0}^{N-1} \sum_{n=0}^{N-1} \left(\delta_{mn}\sigma_m^2\cos(m\omega_0 k_1\Delta t)\cos(n\omega_0 k_2\Delta t)\right. \\
+        &= \sum_{m=0}^{N/2} \sum_{n=0}^{N/2} \left(\delta_{mn}\sigma_m^2\cos(m\omega_0 k_1\Delta t)\cos(n\omega_0 k_2\Delta t)\right. \\
         &\hspace{2cm}+ 0\cos(m\omega_0 k_1\Delta t)\sin(n\omega_0 k_2\Delta t) \\
         &\hspace{2cm}+ 0\sin(m\omega_0 k_1\Delta t)\cos(n\omega_0 k_2\Delta t) \\
         &\hspace{2cm}+\left.\delta_{mn}\sigma_m^2 \sin(m\omega_0 k_1\Delta t)\sin(n\omega_0 k_2\Delta t)\right) \\
-        &= \sum_{m=0}^{N-1} \sigma_m^2\left(\cos(m\omega_0 k_1\Delta t)\cos(m\omega_0 k_2\Delta t) + \sin(m\omega_0 k_1\Delta t)\sin(m\omega_0 k_2\Delta t)\right) \\
+        &= \sum_{m=0}^{N/2} \sigma_m^2\left(\cos(m\omega_0 k_1\Delta t)\cos(m\omega_0 k_2\Delta t) + \sin(m\omega_0 k_1\Delta t)\sin(m\omega_0 k_2\Delta t)\right) \\
+        &= \sum_{m=0}^{N/2} \sigma_m^2\cos(m\omega_0 (k_1-k_2)\Delta t) \\
     \end{align*}
 
     I don't think we can smplify much further, now let's find the variance:
 
     \begin{align*}
         \operatorname{var}(n(t_k)) &=\operatorname{cov}(n(t_k), n(t_k)) \\
-        &= \sum_{m=0}^{N-1} \sigma_m^2\left(\cos(m\omega_0 k\Delta t)\cos(m\omega_0 k\Delta t) + \sin(m\omega_0 k\Delta t)\sin(m\omega_0 k\Delta t)\right) \\
-        &= \sum_{m=0}^{N-1} \sigma_m^2\left(\cos^2(m\omega_0 k\Delta t) + \sin^2(m\omega_0 k\Delta t)\right) \\
-        &= \sum_{m=0}^{N-1} \sigma_m^2 \\
+        &= \sum_{m=0}^{N/2} \sigma_m^2\cos(m\omega_0 (k-k)\Delta t) \\
+        &= \sum_{m=0}^{N/2} \sigma_m^2 \\
     \end{align*}
 
-    Then find the mean:
+    For the mean, note that $A_k, B_k$ have mean zero, and to get the mean of a linear combination of Gaussians you simply take the same linear combination of means.
 
     \begin{align*}
-        \overline{n(t_k)} &= 
+        \overline{n(t_k)} &= 0.
     \end{align*}
 
-
     \item Suppose we are trying to fit a function $C_s(t)$ to some measured time series, where $s(t)$ is a known shape and $C$ is an unknown normalization we would like to fit for. Our model for the measured data $g(t)$ is $g(t) = C_s(t) + n(t)$, where $n(t)$ is the randomly generated noise from our stationary noise model described above. If we write down a least squares fit directly using the $N$ data points $g(t_k)$, we would find that they have a non-trivial covariance matrix (see Part A). But suppose that we take a discrete Fourier transform of $g(t)$ and $s(t)$ to get some sets of coefficients $\tilde{g}$ and $\tilde{s}$, analogous to $\tilde{n}$. Show that using these you can now write down a much simpler expression for the least squares formula. Do this, and taking its derivative with respect to $C$ and setting it equal to zero, derive a formula for the best fit $\hat{C}$ in terms of $g(t)$, $s(t)$, and $\sigma_m$.
+
+    Recall what a discrete Fourier transform is:
+    \begin{align*}
+        f(t) &= \sum_n F_n e^{-im\omega_0 t}
+    \end{align*}
+
+    Here, we have
+    \begin{align*}
+        g(t) &= \sum_m \tilde{g}_m e^{-im\omega_0 t} \\
+        s(t) &= \sum_m \tilde{s}_m e^{-im\omega_0 t} \\
+        g(t) - Cs(t) - n(t) &= \sum_n (\tilde{g}_m - C\tilde{s}_m - \tilde{n}_m) e^{-im\omega_0 t} = 0 \\
+        g(t) - Cs(t) - n(t) &= \sum_n (\tilde{g}_m - C\tilde{s}_m) e^{-im\omega_0 t} = 0 \\
+    \end{align*}
+
+    (we could also use sines and cosines like in the question, but needing to deal with those separately is a little messy...)
+
+    (also, in the last line we used $\overline{n(t)} = 0$ to get rid of the $\tilde{n}$s)
+
+    So then if we work in the frequency domain,
+    \begin{align*}
+        \chi^2(C) &= \sum_{m} \left(\frac{\tilde{g}_m - C\tilde{s}_m}{\sigma_m}\right)^2 \\
+    \end{align*}
+
+    Take the derivative, set it to zero, and find an expression for $C$:
+    \begin{align*}
+        \frac{\d}{\d C}\chi^2(C) &= \sum_{m} 2\left(\frac{\tilde{g}_m - C\tilde{s}_m}{\sigma_m}\right)(-\tilde{s}_m) \\
+        0 &= -2\sum_{m}\left(\frac{\tilde{g}_m - C\tilde{s}_m}{\sigma_m^2}\right)(\tilde{s}_m) \\
+        0 &= \sum_{m} \frac{-\tilde{g}_m\tilde{s}_m + C\tilde{s}_m^2}{\sigma_m^2} \\
+        \sum_{m} \frac{\tilde{g}_m\tilde{s}_m}{\sigma_m^2} &= C\sum_{m} \frac{\tilde{s}_m^2}{\sigma_m^2} \\
+        \frac{\sum_{m} \frac{\tilde{g}_m\tilde{s}_m}{\sigma_m^2}}{\sum_{m} \frac{\tilde{s}_m^2}{\sigma_m^2}} &= C \\
+    \end{align*}
 
 \end{enumerate}

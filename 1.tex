@@ -48,10 +48,7 @@
     See the code for details on the calculation of these numbers, but I just calculated the $p$-value for increasing $n$ until it went below 0.05 (95\% confidence level).
 
     \item Her hospital's medical ethics board advises her that if the treatment proves to be very effective, then it would be unethical to continue the study. Instead, she should end the study early and publish the results so that other patients can benefit from the treatment. Therefore she modifies the study. Starting after the first 25 patients are treated, she counts up how many patients have recovered, and calculates the probability that at least that many would have recovered just by chance. If this probability is less than 1\%, she will end the study immediately and reject the null hypothesis, concluding that the treatment is effective. She continues to calculate this probability after each additional patient is treated until the treatment has proven effective or until she has treated 100 patients. The treatment is deemed successful if either the study ended early due to its apparent effectiveness, or if after 100 patients the number of recovered patients is greater than that calculated in Part A. In these two cases she will either write a paper saying that the treatment proved effective at the 99\% CL or at the 95\% CL, depending on whether the trial ended early or not. Suppose that in reality the treatment has no effect on patient outcomes. What is the probability that the null hypothesis is rejected anyway? What is the probability that researcher publishes a paper rejecting the null hypothesis at the 99\% CL?
-    
-    Simulate this: 
 
-
-
+    See q1.py for the implementation, but I simulated the null hypothesis by choosing random 1s and 0s for alive or dead, and followed the procedure in the question for accepting/rejecting the null hypothesis at the 99\% or 95\% CL. After 100000 trials, I found P(null hypothesis rejected) = 0.0431, P(rejected at the 95\% CL) = 0.0396.
 
 \end{enumerate}
