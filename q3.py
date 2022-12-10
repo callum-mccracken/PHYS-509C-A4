@@ -3,6 +3,7 @@ from matplotlib import pyplot as plt
 import numpy as np
 import matplotlib
 from scipy.integrate import quad
+from tqdm import tqdm
 import utils
 
 matplotlib.rcParams['mathtext.fontset'] = 'stix'
@@ -10,7 +11,7 @@ matplotlib.rcParams['font.family'] = 'STIXGeneral'
 
 def likelihood(k, p, N):
     """Binomial function, normalized"""
-    return 11*utils.binomial_pmf(k, N, p)
+    return utils.binomial_pmf(k, N, p)
 
 def ratio(k, p, N):
     """Likelihood ratio using ML best p = k/N."""
@@ -37,28 +38,46 @@ def get_p_bounds(p, R, value):
         right_bound = p[-1]
     return left_bound, right_bound
 
-k = list(range(11))
-upper_limits = []
-lower_limits = []
+k = np.arange(11)
+upper_limits = np.array([-np.inf]*len(k))
+lower_limits = np.array([np.inf]*len(k))
 
-for k_i in k:
-    print(k_i)
+for p in tqdm(np.linspace(0, 1, 1000)):
     # Highest R will be when p=k/N
-    p = np.linspace(0, 1, 1000)
-    R = ratio(k_i, p, N=10)
-    # start from the highest R = 1
+    likelihoods = likelihood(k, p, N=10)
+    ratios = ratio(k, p, N=10)
+    
+    # start from the highest R
+    sort_order = np.array(list(reversed(np.argsort(ratios))))
+    likelihoods = likelihoods[sort_order]
+    ratios = ratios[sort_order]
+    k = k[sort_order]
     integral = 0
-    r_limit = 1
+    index = 0
+    lower_k = np.inf
+    upper_k = -np.inf
     while integral <= 0.9:
-        r_limit -= 0.001
-        p_bounds = get_p_bounds(p, R, r_limit)
-        int_func = lambda p: likelihood(k_i, p, N=10)
-        integral = quad(int_func, *p_bounds)[0]
-    lower_limits.append(p_bounds[0])
-    upper_limits.append(p_bounds[1])
+        integral += likelihoods[index]
+        if k[index] < lower_k:
+            lower_k = k[index]
+        if k[index] > upper_k:
+            upper_k = k[index]
+        index += 1
+
+    # update upper/lower limits at the bounds we found
+    if p > upper_limits[lower_k]:
+        upper_limits[lower_k] = p
+    if p < lower_limits[upper_k]:
+        lower_limits[upper_k] = p
 
 # we only want the last one
 print(lower_limits[-1], upper_limits[-1])
+
+
+k = k[np.argsort(k)]
+print(k)
+#upper_limits = upper_limits[sort_order]
+#lower_limits = lower_limits[sort_order]
 plt.step(k, upper_limits, label="Upper limit")
 plt.step(k, lower_limits, label="Lower limit")
 plt.legend()
