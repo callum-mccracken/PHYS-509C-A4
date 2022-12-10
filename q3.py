@@ -46,7 +46,7 @@ for p in tqdm(np.linspace(0, 1, 1000)):
     # Highest R will be when p=k/N
     likelihoods = likelihood(k, p, N=10)
     ratios = ratio(k, p, N=10)
-    
+
     # start from the highest R
     sort_order = np.array(list(reversed(np.argsort(ratios))))
     likelihoods = likelihoods[sort_order]
